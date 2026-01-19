@@ -60,3 +60,60 @@ def create_similarity_search_collection(collection_name: str, collection_metadat
             "embedding_function": sentence_transformer_ef
         }
     )
+
+def populate_similarity_collection(collection, food_items: List[Dict]):
+    documents = []
+    metadatas = []
+    ids = []
+
+    used_ids = set()
+
+    for i, food in enumerate(food_items):
+        text = f"Name: {food['food_name']}. "
+        text += f"Description: {food.get('food_description', '')}. "
+        text += f"Ingredients: {', '.join(food.get('food_ingredients', []))}. "
+        text += f"Cuisine: {food.get('cuisine_type', 'Unknown')}. "
+        text += f"Cooking method: {food.get('cooking_method', '')}. "
+
+        taste_profile = food.get('taste_profile','')
+        if taste_profile:
+            text += f"Taste and features: {taste_profile}. "
+
+        health_benefits = food.get('food_health_benefits', '')
+        if health_benefits:
+            text += f"Health benefits: {health_benefits}. "
+
+        if 'food_nutritional_factors' in food:
+            nutrition = food['food_nutritional_factors']
+            if isinstance(nutrition, dict):
+                nutrition_text = ', '.join([f"{k}: {v}" for k, v in nutrition.items()])
+                text += f"Nutrition: {nutrition_text}."
+        
+        base_id = str(food.get('food_id', i))
+        unique_id = base_id
+        counter = 1
+        while unique_id in used_ids:
+            unique_id = f"{base_id}_{counter}"
+            counter += 1
+        used_ids.add(unique_id)
+        
+        documents.append(text)
+        ids.append(unique_id)
+        metadatas.append({
+            "name": food["food_name"],
+            "cuisine_type": food.get("cuisine_type", "Unknown"),
+            "ingredients": ", ".join(food.get("food_ingredients", [])),
+            "calories": food.get("food_calories_per_serving", 0),
+            "description": food.get("food_description", ""),
+            "cooking_method": food.get("cooking_method", ""),
+            "health_benefits": food.get("food_health_benefits", ""),
+            "taste_profile": food.get("taste_profile", "")
+        })
+    # Add all data to collection
+    collection.add(
+        documents=documents,
+        metadatas=metadatas,
+        ids=ids
+    )
+    
+    print(f"Added {len(food_items)} food items to collection")
