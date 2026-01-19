@@ -111,4 +111,20 @@ def handle_food_search(collection, query):
     suggest_related_searches(results)
 
 def suggest_related_searches(results):
-    pass
+    
+    if not results:
+        return
+    
+    cuisines = list(set([r['cuisine_type'] for r in results]))
+
+    for cuisine in cuisines[:3]:  # Limit to 3 suggestions
+        print(f"   • Try '{cuisine} dishes' for more {cuisine} options")
+
+    avg_calories = sum([r['food_calories_per_serving'] for r in results]) / len(results)
+    if avg_calories > 350:
+        print("   • Try 'low calorie' for lighter options")
+    else:
+        print("   • Try 'hearty meal' for more substantial dishes")
+
+if __name__ == "__main__":
+    main()
