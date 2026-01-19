@@ -31,7 +31,7 @@ def load_food_data(file_path: str) -> List[Dict]:
                 taste_features= []
                 for key, value in item['food_features'].items():
                     if value:
-                        taste_features.append(str[value])
+                        taste_features.append(str(value))
                 item['taste_profile'] = ', '.join(taste_features)
             else :
                 item['taste_profile'] = ''
@@ -55,9 +55,9 @@ def create_similarity_search_collection(collection_name: str, collection_metadat
     return client.create_collection(
         name= collection_name,
         metadata= collection_metadata,
+        embedding_function= sentence_transformer_ef,
         configuration={
             "hnsw": {"space": "cosine"},
-            "embedding_function": sentence_transformer_ef
         }
     )
 
