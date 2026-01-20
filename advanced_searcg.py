@@ -144,7 +144,40 @@ def perform_calorie_filtered_search(collection):
     display_search_results(results, f"Calorie-Filtered Results ({calorie_text})")
 
 def perform_combined_filtered_search(collection):
-    pass
+    """Perform search with multiple filters combined"""
+    print("\n🎯 COMBINED FILTERS SEARCH")
+    print("-" * 30)
+    
+    query = input("Enter search query: ").strip()
+    cuisine = input("Enter cuisine type (optional): ").strip()
+    max_calories_input = input("Enter maximum calories (optional): ").strip()
+    
+    if not query:
+        print("❌ Please enter a search term")
+        return
+    
+    cuisine_filter = cuisine if cuisine else None
+    max_calories = int(max_calories_input) if max_calories_input.isdigit() else None
+    
+    # Build description of applied filters
+    filter_description = []
+    if cuisine_filter:
+        filter_description.append(f"cuisine: {cuisine_filter}")
+    if max_calories:
+        filter_description.append(f"max calories: {max_calories}")
+    
+    filter_text = ", ".join(filter_description) if filter_description else "no filters"
+    
+    print(f"\n🔍 Searching for '{query}' with {filter_text}...")
+    
+    results = perform_filtered_similarity_search(
+        collection, query, 
+        cuisine_filter=cuisine_filter, 
+        max_calories=max_calories, 
+        n_results=5
+    )
+    
+    display_search_results(results, f"Combined Filtered Results ({filter_text})")
 
 def run_search_demonstrations(collection):
     pass
