@@ -66,7 +66,19 @@ def interactive_advanced_search(collection):
             print(f"❌ Error: {e}")
 
 def perform_basic_search(collection):
-    pass
+    """Perform basic similarity search without filters"""
+    print("\n🔍 BASIC SIMILARITY SEARCH")
+    print("-" * 30)
+
+    query = input("Enter search query: ").strip()
+    if not query:
+        print("❌ Please enter a search term")
+        return
+    
+    print(f"\n🔍 Searching for '{query}'...")
+    results = perform_similarity_search(collection, query, 5)
+    
+    display_search_results(results, "Basic Search Results")
 
 def perform_cuisine_filtered_search(collection):
     pass
@@ -81,4 +93,7 @@ def run_search_demonstrations(collection):
     pass
 
 def show_advanced_help():
+    pass
+
+def display_search_results():
     pass
