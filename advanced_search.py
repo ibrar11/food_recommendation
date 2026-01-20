@@ -269,3 +269,6 @@ def display_search_results(results, title, show_details=True):
             print(f"   {i}. {result['food_name']} ({score_percentage:.1f}% match)")
     
     print("=" * 50)
+
+if __name__ == "__main__":
+    main()
