@@ -81,7 +81,42 @@ def perform_basic_search(collection):
     display_search_results(results, "Basic Search Results")
 
 def perform_cuisine_filtered_search(collection):
-    pass
+    """Perform cuisine-filtered similarity search"""
+    print("\n🍽️ CUISINE-FILTERED SEARCH")
+    print("-" * 30)
+
+    # Show available cuisines from our dataset
+    cuisines = ["Italian", "Thai", "Mexican", "Indian", "Japanese", "French", 
+                "Mediterranean", "American", "Health Food", "Dessert"]
+    print("Available cuisines:")
+    for i, cuisine in enumerate(cuisines, 1):
+        print(f"  {i}. {cuisine}")
+
+    query = input("\nEnter search query: ").strip()
+    cuisine_choice = input("Enter cuisine number (or cuisine name): ").strip()
+    
+    if not query:
+        print("❌ Please enter a search term")
+        return
+    
+    cuisine_filter = None
+    if cuisine_choice.isdigit():
+        idx = int(cuisine_choice) - 1
+        if 0 <= idx < len(cuisines):
+            cuisine_filter = cuisines[idx]
+    else:
+        cuisine_filter = cuisine_choice
+
+    if not cuisine_filter:
+        print("❌ Invalid cuisine selection")
+        return
+    
+    print(f"\n🔍 Searching for '{query}' in {cuisine_filter} cuisine...")
+    results = perform_filtered_similarity_search(
+        collection, query, cuisine_filter=cuisine_filter, n_results=5
+    )
+
+    display_search_results(results, f"Cuisine-Filtered Results ({cuisine_filter})")
 
 def perform_calorie_filtered_search(collection):
     pass
