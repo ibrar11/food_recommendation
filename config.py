@@ -1,0 +1,10 @@
+LLM_MODEL_ID = "ibm-granite/granite-3.2-2b-instruct"
+
+SIMILARITY_TOP_K = 5
+TEMPERATURE = 0.1
+MAX_NEW_TOKENS = 500
+MIN_NEW_TOKENS = 1
+TOP_K = 50
+TOP_P = 1
+
+CHUNK_SIZE = 500
