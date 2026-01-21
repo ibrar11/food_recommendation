@@ -234,5 +234,31 @@ def show_enhanced_rag_help():
 def handle_enhanced_comparison_mode(collection):
     pass
 
-def handle_enhanced_rag_query(collection, user_input, conversation_history):
-    pass
+def handle_enhanced_rag_query(collection, query: str, conversation_history: List[str]):
+    """Handle user query with enhanced RAG approach using IBM Granite"""
+    print(f"\n🔍 Searching vector database for: '{query}'...")
+    
+    # Perform similarity search with more results for better context
+    search_results = perform_similarity_search(collection, query, 3)
+    
+    if not search_results:
+        print("🤖 Bot: I couldn't find any food items matching your request.")
+        print("      Try describing what you're in the mood for with different words!")
+        return
+    
+    print(f"✅ Found {len(search_results)} relevant matches")
+    print("🧠 Generating AI-powered response...")
+    
+    # Generate enhanced RAG response using IBM Granite
+    ai_response = generate_llm_rag_response(query, search_results)
+    
+    print(f"\n🤖 Bot: {ai_response}")
+    
+    # Show detailed results for reference
+    print(f"\n📊 Search Results Details:")
+    print("-" * 45)
+    for i, result in enumerate(search_results[:3], 1):
+        print(f"{i}. 🍽️  {result['food_name']}")
+        print(f"   📍 {result['cuisine_type']} | 🔥 {result['food_calories_per_serving']} cal | 📈 {result['similarity_score']*100:.1f}% match")
+        if i < 3:
+            print()
