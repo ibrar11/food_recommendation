@@ -2,6 +2,7 @@ from huggingface_hub import login
 from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM
 from llama_index.llms.huggingface import HuggingFaceLLM
+from shared_functions import *
 
 import os
 import config
@@ -45,3 +46,44 @@ def create_hf_LLM(
     except Exception as e:
         print(f"Failed to create HuggingFace LLM: {e}")
         return None
+    
+def main():
+    """Main function for enhanced RAG chatbot system"""
+    try:
+        print("🤖 Enhanced RAG-Powered Food Recommendation Chatbot")
+        print("   Powered by IBM Granite & ChromaDB")
+        print("=" * 55)
+        
+        # Load food data
+        global food_items
+        food_items = load_food_data('./FoodDataSet.json')
+        print(f"✅ Loaded {len(food_items)} food items")
+        
+        # Create collection for RAG system
+        collection = create_similarity_search_collection(
+            "enhanced_rag_food_chatbot",
+            {'description': 'Enhanced RAG chatbot with IBM watsonx.ai integration'}
+        )
+        populate_similarity_collection(collection, food_items)
+        print("✅ Vector database ready")
+        
+        hf_login()
+        model = create_hf_LLM()
+        # Test LLM connection
+        print("🔗 Testing LLM connection...")
+
+        test_response = model.complete("Hello")
+
+        if test_response:
+            print("✅ LLM connection established")
+        else:
+            print("❌ LLM connection failed")
+            return
+        
+        enhanced_rag_food_chatbot(collection)
+
+    except Exception as error:
+        print(f"❌ Error: {error}")
+
+def enhanced_rag_food_chatbot(collection):
+    pass
