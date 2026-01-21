@@ -126,3 +126,53 @@ def prepare_context_for_llm(query: str, search_results: List[Dict]) -> str:
         context_parts.extend(food_context)
     
     return "\n".join(context_parts)
+
+def generate_llm_rag_response(query: str, search_results: List[Dict]) -> str:
+    """Generate response using IBM Granite with retrieved context"""
+    try:
+        # Prepare context from search results
+        context = prepare_context_for_llm(query, search_results)
+        
+        # Build the prompt for the LLM
+        prompt = config.USER_QUESTION_TEMPLATE.format(
+            query=query,
+            context=context
+        )
+
+        model = create_hf_LLM()
+
+        response = model.complete(prompt)
+
+
+        if response:            
+            # Clean up the response if needed
+            response_text = response.text.strip()
+            
+            # If response is too short, provide a fallback
+            if len(response_text) < 50:
+                return generate_fallback_response(query, search_results)
+            
+            return response_text
+        else:
+            return generate_fallback_response(query, search_results)
+
+    except Exception as e:
+        print(f"❌ LLM Error: {e}")
+        return
+
+def generate_fallback_response(query: str, search_results: List[Dict]) -> str:
+    """Generate fallback response when LLM fails"""
+    if not search_results:
+        return "I couldn't find any food items matching your request. Try describing what you're in the mood for with different words!"
+    
+    top_result = search_results[0]
+    response_parts = []
+    
+    response_parts.append(f"Based on your request for '{query}', I'd recommend {top_result['food_name']}.")
+    response_parts.append(f"It's a {top_result['cuisine_type']} dish with {top_result['food_calories_per_serving']} calories per serving.")
+    
+    if len(search_results) > 1:
+        second_choice = search_results[1]
+        response_parts.append(f"Another great option would be {second_choice['food_name']}.")
+    
+    return " ".join(response_parts)
