@@ -229,7 +229,30 @@ def generate_fallback_response(query: str, search_results: List[Dict]) -> str:
     return " ".join(response_parts)
 
 def show_enhanced_rag_help():
-    pass
+    """Display help information for enhanced RAG chatbot"""
+    print("\n📖 ENHANCED RAG CHATBOT HELP")
+    print("=" * 45)
+    print("🧠 This chatbot uses HF Granite to understand your")
+    print("   food preferences and provide intelligent recommendations.")
+    print("\nHow to get the best recommendations:")
+    print("  • Be specific: 'healthy Italian pasta under 350 calories'")
+    print("  • Mention preferences: 'spicy comfort food for cold weather'")
+    print("  • Include context: 'light breakfast for busy morning'")
+    print("  • Ask about benefits: 'protein-rich foods for workout recovery'")
+    print("\nSpecial features:")
+    print("  • 🔍 Vector similarity search finds relevant foods")
+    print("  • 🧠 AI analysis provides contextual explanations")
+    print("  • 📊 Detailed nutritional and cuisine information")
+    print("  • 🔄 Smart comparison between different preferences")
+    print("\nCommands:")
+    print("  • 'compare' - AI-powered comparison of two queries")
+    print("  • 'help' - Show this help menu")
+    print("  • 'quit' - Exit the chatbot")
+    print("\nTips for better results:")
+    print("  • Use natural language - talk like you would to a friend")
+    print("  • Mention dietary restrictions or preferences")
+    print("  • Include meal timing (breakfast, lunch, dinner)")
+    print("  • Specify if you want healthy, comfort, or indulgent options")
 
 def handle_enhanced_rag_query(collection, query: str, conversation_history: List[str]):
     """Handle user query with enhanced RAG approach using IBM Granite"""
@@ -338,3 +361,5 @@ def generate_simple_comparison(query1: str, query2: str, results1: List[Dict], r
     if not results2:
         return f"Found results for '{query1}' but none for '{query2}'."
     
+if __name__ == "__main__":
+    main()
