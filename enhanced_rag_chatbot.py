@@ -86,7 +86,58 @@ def main():
         print(f"❌ Error: {error}")
 
 def enhanced_rag_food_chatbot(collection):
-    pass
+    """Enhanced RAG-powered conversational food chatbot with HF Granite"""
+    print("\n" + "="*70)
+    print("🤖 ENHANCED RAG FOOD RECOMMENDATION CHATBOT")
+    print("   Powered by HF's Granite Model")
+    print("="*70)
+    print("💬 Ask me about food recommendations using natural language!")
+    print("\nExample queries:")
+    print("  • 'I want something spicy and healthy for dinner'")
+    print("  • 'What Italian dishes do you recommend under 400 calories?'")
+    print("  • 'I'm craving comfort food for a cold evening'")
+    print("  • 'Suggest some protein-rich breakfast options'")
+    print("\nCommands:")
+    print("  • 'help' - Show detailed help menu")
+    print("  • 'compare' - Compare recommendations for two different queries")
+    print("  • 'quit' - Exit the chatbot")
+    print("-" * 70)
+    
+    conversation_history = []
+
+    while True:
+        try:
+            user_input = input("\n👤 You: ").strip()
+            
+            if not user_input:
+                print("🤖 Bot: Please tell me what kind of food you're looking for!")
+                continue
+            
+            if user_input.lower() in ['quit', 'exit', 'q']:
+                print("\n🤖 Bot: Thank you for using the Enhanced RAG Food Chatbot!")
+                print("      Hope you found some delicious recommendations! 👋")
+                break
+
+            elif user_input.lower() in ['help', 'h']:
+                show_enhanced_rag_help()
+            
+            elif user_input.lower() in ['compare']:
+                handle_enhanced_comparison_mode(collection)
+            
+            else:
+                # Process the food query with enhanced RAG
+                handle_enhanced_rag_query(collection, user_input, conversation_history)
+                conversation_history.append(user_input)
+                
+                # Keep conversation history manageable
+                if len(conversation_history) > 5:
+                    conversation_history = conversation_history[-3:]
+                
+        except KeyboardInterrupt:
+            print("\n\n🤖 Bot: Goodbye! Hope you find something delicious! 👋")
+            break
+        except Exception as e:
+            print(f"❌ Bot: Sorry, I encountered an error: {e}")
 
 def prepare_context_for_llm(query: str, search_results: List[Dict]) -> str:
     """Prepare structured context from search results for LLM"""
@@ -176,3 +227,12 @@ def generate_fallback_response(query: str, search_results: List[Dict]) -> str:
         response_parts.append(f"Another great option would be {second_choice['food_name']}.")
     
     return " ".join(response_parts)
+
+def show_enhanced_rag_help():
+    pass
+
+def handle_enhanced_comparison_mode(collection):
+    pass
+
+def handle_enhanced_rag_query(collection, user_input, conversation_history):
+    pass
