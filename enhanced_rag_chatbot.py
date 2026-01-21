@@ -197,7 +197,7 @@ def generate_llm_rag_response(query: str, search_results: List[Dict]) -> str:
 
         if response:            
             # Clean up the response if needed
-            response_text = response.text.strip()
+            response_text = response.strip()
             
             # If response is too short, provide a fallback
             if len(response_text) < 50:
@@ -231,9 +231,6 @@ def generate_fallback_response(query: str, search_results: List[Dict]) -> str:
 def show_enhanced_rag_help():
     pass
 
-def handle_enhanced_comparison_mode(collection):
-    pass
-
 def handle_enhanced_rag_query(collection, query: str, conversation_history: List[str]):
     """Handle user query with enhanced RAG approach using IBM Granite"""
     print(f"\n🔍 Searching vector database for: '{query}'...")
@@ -262,3 +259,82 @@ def handle_enhanced_rag_query(collection, query: str, conversation_history: List
         print(f"   📍 {result['cuisine_type']} | 🔥 {result['food_calories_per_serving']} cal | 📈 {result['similarity_score']*100:.1f}% match")
         if i < 3:
             print()
+
+def handle_enhanced_comparison_mode(collection):
+    """Enhanced comparison between two food queries using LLM"""
+    print("\n🔄 ENHANCED COMPARISON MODE")
+    print("   Powered by AI Analysis")
+    print("-" * 35)
+    
+    query1 = input("Enter first food query: ").strip()
+    query2 = input("Enter second food query: ").strip()
+    
+    if not query1 or not query2:
+        print("❌ Please enter both queries for comparison")
+        return
+    
+    print(f"\n🔍 Analyzing '{query1}' vs '{query2}' with AI...")
+    
+    # Get results for both queries
+    results1 = perform_similarity_search(collection, query1, 3)
+    results2 = perform_similarity_search(collection, query2, 3)
+    
+    # Generate AI-powered comparison
+    comparison_response = generate_llm_comparison(query1, query2, results1, results2)
+    
+    print(f"\n🤖 AI Analysis: {comparison_response}")
+    
+    # Show side-by-side results
+    print(f"\n📊 DETAILED COMPARISON")
+    print("=" * 60)
+    print(f"{'Query 1: ' + query1[:20] + '...' if len(query1) > 20 else 'Query 1: ' + query1:<30} | {'Query 2: ' + query2[:20] + '...' if len(query2) > 20 else 'Query 2: ' + query2}")
+    print("-" * 60)
+    
+    max_results = max(len(results1), len(results2))
+    for i in range(min(max_results, 3)):
+        left = f"{results1[i]['food_name']} ({results1[i]['similarity_score']*100:.0f}%)" if i < len(results1) else "---"
+        right = f"{results2[i]['food_name']} ({results2[i]['similarity_score']*100:.0f}%)" if i < len(results2) else "---"
+        print(f"{left[:30]:<30} | {right[:30]}")
+
+def generate_llm_comparison(query1: str, query2: str, results1: List[Dict], results2: List[Dict]) -> str:
+    """Generate AI-powered comparison between two queries"""
+    try:
+        context1 = prepare_context_for_llm(query1, results1[:3])
+        context2 = prepare_context_for_llm(query2, results2[:3])
+        
+        comparison_prompt = f'''You are analyzing and comparing two different food preference queries. Please provide a thoughtful comparison.
+Query 1: "{query1}"
+Top Results for Query 1:
+{context1}
+Query 2: "{query2}"
+Top Results for Query 2:
+{context2}
+Please provide a short comparison that:
+1. Highlights the key differences between these two food preferences
+2. Notes any similarities or overlaps
+3. Explains which query might be better for different situations
+4. Recommends the best option from each query
+5. Keeps the analysis concise but insightful
+Comparison:'''
+        
+        model = create_hf_LLM()
+
+        generated_response = model.complete(comparison_prompt)
+        
+        if generated_response:
+            return generated_response.strip()
+        else:
+            return generate_simple_comparison(query1, query2, results1, results2)
+            
+    except Exception as e:
+        return generate_simple_comparison(query1, query2, results1, results2)
+    
+def generate_simple_comparison(query1: str, query2: str, results1: List[Dict], results2: List[Dict]) -> str:
+    """Simple comparison fallback"""
+    if not results1 and not results2:
+        return "No results found for either query."
+    if not results1:
+        return f"Found results for '{query2}' but none for '{query1}'."
+    if not results2:
+        return f"Found results for '{query1}' but none for '{query2}'."
+    
