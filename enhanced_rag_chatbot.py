@@ -80,12 +80,12 @@ def main():
             print("❌ LLM connection failed")
             return
         
-        enhanced_rag_food_chatbot(collection)
+        enhanced_rag_food_chatbot(collection, model)
 
     except Exception as error:
         print(f"❌ Error: {error}")
 
-def enhanced_rag_food_chatbot(collection):
+def enhanced_rag_food_chatbot(collection, model):
     """Enhanced RAG-powered conversational food chatbot with HF Granite"""
     print("\n" + "="*70)
     print("🤖 ENHANCED RAG FOOD RECOMMENDATION CHATBOT")
@@ -122,11 +122,11 @@ def enhanced_rag_food_chatbot(collection):
                 show_enhanced_rag_help()
             
             elif user_input.lower() in ['compare']:
-                handle_enhanced_comparison_mode(collection)
+                handle_enhanced_comparison_mode(collection, model)
             
             else:
                 # Process the food query with enhanced RAG
-                handle_enhanced_rag_query(collection, user_input, conversation_history)
+                handle_enhanced_rag_query(collection, user_input, conversation_history, model)
                 conversation_history.append(user_input)
                 
                 # Keep conversation history manageable
@@ -178,7 +178,7 @@ def prepare_context_for_llm(query: str, search_results: List[Dict]) -> str:
     
     return "\n".join(context_parts)
 
-def generate_llm_rag_response(query: str, search_results: List[Dict]) -> str:
+def generate_llm_rag_response(query: str, search_results: List[Dict], model) -> str:
     """Generate response using IBM Granite with retrieved context"""
     try:
         # Prepare context from search results
@@ -190,14 +190,12 @@ def generate_llm_rag_response(query: str, search_results: List[Dict]) -> str:
             context=context
         )
 
-        model = create_hf_LLM()
-
         response = model.complete(prompt)
 
 
         if response:            
             # Clean up the response if needed
-            response_text = response.strip()
+            response_text = response.text.strip()
             
             # If response is too short, provide a fallback
             if len(response_text) < 50:
@@ -254,7 +252,7 @@ def show_enhanced_rag_help():
     print("  • Include meal timing (breakfast, lunch, dinner)")
     print("  • Specify if you want healthy, comfort, or indulgent options")
 
-def handle_enhanced_rag_query(collection, query: str, conversation_history: List[str]):
+def handle_enhanced_rag_query(collection, query: str, conversation_history: List[str], model):
     """Handle user query with enhanced RAG approach using IBM Granite"""
     print(f"\n🔍 Searching vector database for: '{query}'...")
     
@@ -270,7 +268,7 @@ def handle_enhanced_rag_query(collection, query: str, conversation_history: List
     print("🧠 Generating AI-powered response...")
     
     # Generate enhanced RAG response using IBM Granite
-    ai_response = generate_llm_rag_response(query, search_results)
+    ai_response = generate_llm_rag_response(query, search_results, model)
     
     print(f"\n🤖 Bot: {ai_response}")
     
@@ -283,7 +281,7 @@ def handle_enhanced_rag_query(collection, query: str, conversation_history: List
         if i < 3:
             print()
 
-def handle_enhanced_comparison_mode(collection):
+def handle_enhanced_comparison_mode(collection, model):
     """Enhanced comparison between two food queries using LLM"""
     print("\n🔄 ENHANCED COMPARISON MODE")
     print("   Powered by AI Analysis")
@@ -303,7 +301,7 @@ def handle_enhanced_comparison_mode(collection):
     results2 = perform_similarity_search(collection, query2, 3)
     
     # Generate AI-powered comparison
-    comparison_response = generate_llm_comparison(query1, query2, results1, results2)
+    comparison_response = generate_llm_comparison(query1, query2, results1, results2, model)
     
     print(f"\n🤖 AI Analysis: {comparison_response}")
     
@@ -319,7 +317,7 @@ def handle_enhanced_comparison_mode(collection):
         right = f"{results2[i]['food_name']} ({results2[i]['similarity_score']*100:.0f}%)" if i < len(results2) else "---"
         print(f"{left[:30]:<30} | {right[:30]}")
 
-def generate_llm_comparison(query1: str, query2: str, results1: List[Dict], results2: List[Dict]) -> str:
+def generate_llm_comparison(query1: str, query2: str, results1: List[Dict], results2: List[Dict], model) -> str:
     """Generate AI-powered comparison between two queries"""
     try:
         context1 = prepare_context_for_llm(query1, results1[:3])
@@ -339,13 +337,11 @@ Please provide a short comparison that:
 4. Recommends the best option from each query
 5. Keeps the analysis concise but insightful
 Comparison:'''
-        
-        model = create_hf_LLM()
 
         generated_response = model.complete(comparison_prompt)
         
         if generated_response:
-            return generated_response.strip()
+            return generated_response.text.strip()
         else:
             return generate_simple_comparison(query1, query2, results1, results2)
             
